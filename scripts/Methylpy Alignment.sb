@@ -1,0 +1,64 @@
+
+###Methylpy_alignment Bean#######
+
+#!/bin/bash --login
+########## Define Resources Needed with SBATCH Lines ##########
+ 
+#SBATCH --time=24:00:00             # limit of wall clock time - how long the job will run (same as -t)
+#SBATCH --ntasks=1                  # number of tasks - how many tasks (nodes) that you require (same as -n)
+#SBATCH --cpus-per-task=20           # number of CPUs (or cores) per task (same as -c)
+#SBATCH --mem=110G                    # memory required per node - amount of memory (in bytes)
+#SBATCH --job-name E42B_alignment      # you can give your job a name for easier identification (same as -J)
+#SBATCH --ntasks-per-node=1
+ 
+########## Command Lines to Run ##########
+
+#Set this variable to the path to wherever you have conda installed
+conda="${HOME}/miniconda3"
+
+
+#Change to current directory
+cd ${PBS_O_WORKDIR}
+#Export paths to conda
+export PATH="${conda}/envs/methylpy_env/bin:${PATH}"
+export LD_LIBRARY_PATH="${conda}/envs/methylpy_env/lib:${LD_LIBRARY_PATH}"
+#Path to picard jar. Change this to appropriate path
+picard="${conda}/envs/methylpy_env/share/picard-2.18.29-0"
+
+
+mkdir alignment
+
+methylpy paired-end-pipeline \
+--read1-files E42B_S18_L004_R1_001.fastq.gz \
+--read2-files E42B_S18_L004_R2_001.fastq.gz \
+--sample E42B \
+--forward-ref /mnt/gs21/scratch/brownh15/beanMETHYL/Pvulgaris/ref/Pvulgaris-v2.0_f \
+--reverse-ref /mnt/gs21/scratch/brownh15/beanMETHYL/Pvulgaris/ref/Pvulgaris-v2.0_r \
+--ref-fasta /mnt/gs21/scratch/brownh15/beanMETHYL/Pvulgaris/ref/Pvulgaris-v2.0_ChrL.fa \
+--path-to-output alignment \
+--aligner "bowtie2" \
+--aligner-options "--very-sensitive -X 1000 " \
+--sort-mem 5G \
+--num-procs 100 \
+--path-to-picard ${picard} \
+--num-upstream-bases 0 \
+--num-downstream-bases 2 \
+--trim-reads False \
+--merge-by-max-mapq True \
+--remove-clonal True \
+--remove-chr-prefix False \
+--unmethylated-control "ChrL" \
+--binom-test True \
+--min-mapq 30 \
+--min-cov 3 
+
+
+
+
+
+
+
+
+
+
+

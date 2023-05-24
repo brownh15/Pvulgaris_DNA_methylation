@@ -1,0 +1,19 @@
+#!/bin/bash --login
+########## Define Resources Needed with SBATCH Lines ##########
+ 
+#SBATCH --time=02:00:00             # limit of wall clock time - how long the job will run (same as -t)
+#SBATCH --ntasks=1                  # number of tasks - how many tasks (nodes) that you require (same as -n)
+#SBATCH --cpus-per-task=3           # number of CPUs (or cores) per task (same as -c)
+#SBATCH --mem=2G                    # memory required per node - amount of memory (in bytes)
+#SBATCH --job-name fastp      # you can give your job a name for easier identification (same as -J)
+#SBATCH --ntasks-per-node=1
+ 
+########## Command Lines to Run ##########
+
+conda="${HOME}/miniconda3"
+
+export PATH="${conda}/envs/fastp/bin:${PATH}"
+export LD_LIBRARY_PATH="${conda}/envs/fastp/lib:${LD_LIBRARY_PATH}"
+
+
+fastp -i E64L_S27_L004_R1_001.fastq.gz -I E64L_S27_L004_R2_001.fastq.gz -o E64L_S27_L004_R1_001_trimmed.fastq.gz -O E64L_S27_L004_R2_001_trimmed.fastq.gz

@@ -1,0 +1,37 @@
+#!/bin/bash --login
+#SBATCH --time=4:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --cpus-per-task=5
+#SBATCH --mem=50GB
+#SBATCH --job-name methylpy-index
+
+
+#Set this variable to the path to wherever you have conda installed
+conda="${HOME}/miniconda3"
+
+#Export paths to conda
+export PATH="${conda}/envs/methylpy_env/bin:${PATH}"
+export LD_LIBRARY_PATH="${conda}/envs/methylpy_env/lib:${LD_LIBRARY_PATH}"
+
+#Set variables
+threads=5
+aligner="bowtie2" #Can be bowtie2, bowtie, minimap2 -> Stongly recommend bowtie2
+species="Pvulgaris"
+
+samtools faidx ${species}-v2.0_ChrL.fa
+
+#Build methylpy index
+methylpy build-reference \
+        --input-files ${species}-v2.0_ChrL.fa \
+        --output-prefix ${species}-v2.0 \
+        --num-procs 5 \
+        --aligner bowtie2
+
+echo "done"
+
+
+
+
+### Add ChrL ###
+cat ChrL.fa Pvulgaris-v2.0.fa > Pvulgaris-v2.0_ChrL.fa
